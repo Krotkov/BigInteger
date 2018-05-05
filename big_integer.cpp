@@ -4,9 +4,7 @@
 
 const unsigned long long MAX_UINT32 = 4294967296u;
 
-big_integer::big_integer() : sign(1) {
-    digits.push_back(0);
-}
+big_integer::big_integer() : sign(1), digits(std::vector<unsigned int>(1, 0)) {}
 
 big_integer::big_integer(int a) {
     if (a < 0) {
