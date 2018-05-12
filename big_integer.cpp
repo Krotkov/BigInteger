@@ -34,22 +34,22 @@ big_integer::big_integer(std::string const &str) {
 
 std::vector<unsigned int> add(const big_integer &first, const big_integer &second) {
     unsigned int carry = 0;
-    std::vector<unsigned int> answer;
     int siz = std::max((int) first.digits.size(), (int) second.digits.size());
+    std::vector<unsigned int> answer(siz+1, 0);
     for (int i = 0; i < siz; i++) {
         long long sum = carry;
         if (i < int(first.digits.size())) sum += (long long) first.digits[i];
         if (i < int(second.digits.size())) sum += (long long) second.digits[i];
-        answer.push_back((unsigned int) sum);
+        answer[i] = ((unsigned int) sum);
         carry = (unsigned int) (sum >> 32);
     }
-    if (carry != 0) answer.push_back(carry);
+    if (carry != 0) answer[siz+1] = (carry);
     return answer;
 }
 
 std::vector<unsigned int> sub(const big_integer &first, const big_integer &second) {
     unsigned int carry = 0;
-    std::vector<unsigned int> answer;
+    std::vector<unsigned int> answer(first.digits.size(), 0);
     for (size_t i = 0; i < first.digits.size(); i++) {
         long long subtract = ((long long) first.digits[i] - (long long) carry);
         if (i < second.digits.size()) subtract -= (long long) second.digits[i];
@@ -59,7 +59,7 @@ std::vector<unsigned int> sub(const big_integer &first, const big_integer &secon
         } else {
             carry = 0;
         }
-        answer.push_back((unsigned int) (subtract));
+        answer[i] = ((unsigned int) (subtract));
     }
     return answer;
 }
@@ -118,8 +118,7 @@ big_integer &big_integer::operator-=(big_integer const &other) {
 
 big_integer &big_integer::operator*=(big_integer const &other) {
     sign = sign * other.sign;
-    std::vector<unsigned int> newDigits;
-    newDigits.resize(this->digits.size() * other.digits.size(), 0);
+    std::vector<unsigned int> newDigits(digits.size() * other.digits.size(), 0);
     unsigned int pointer = 0;
     for (unsigned int a: digits) {
         unsigned int carry = 0;
@@ -177,7 +176,7 @@ big_integer &big_integer::operator&=(big_integer const &other) {
 big_integer &big_integer::operator|=(big_integer const &other) {
     big_integer copy(other);
     makeSameSize(*this, copy);
-    this->digits.push_back(0);
+    digits.push_back(0);
     copy.digits.push_back(0);
     if (sign < 0) {
         reverseNum(*this);
@@ -208,7 +207,7 @@ big_integer &big_integer::operator|=(big_integer const &other) {
 big_integer &big_integer::operator^=(big_integer const &other) {
     big_integer copy(other);
     makeSameSize(*this, copy);
-    this->digits.push_back(0);
+    digits.push_back(0);
     copy.digits.push_back(0);
     if (sign < 0) {
         reverseNum(*this);
@@ -245,7 +244,7 @@ big_integer &big_integer::operator<<=(int shift) {
         return *this;
     }
     std::vector<unsigned int> newDigits;
-    if (shift / 32 != 0) newDigits.resize(shift / 32ull, 0);
+    if (shift / 32 != 0) newDigits.resize(shift / 32 + digits.size(), 0);
     shift %= 32;
     unsigned int carry = 0;
     for (unsigned int &digit : digits) {
