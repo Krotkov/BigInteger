@@ -11,7 +11,8 @@
 #include <cmath>
 
 struct my_vector {
-    static const unsigned int SMALL_SIZE = 15;
+private:
+    static const unsigned int SMALL_SIZE = 5;
     union {
         unsigned int small[SMALL_SIZE];
         std::shared_ptr<std::vector <unsigned int> > big;
@@ -19,13 +20,15 @@ struct my_vector {
     unsigned int _size;
     bool is_small;
 
+    void make_big();
+    void check_count();
+
+public:
     my_vector();
     ~my_vector();
     my_vector(my_vector const &other);
     my_vector &operator=(my_vector const &other);
 
-    void make_big();
-    //void make_small();
 
     unsigned int size() const;
     bool empty();
@@ -44,7 +47,6 @@ struct my_vector {
 
     void clear();
 
-    void check_count();
 };
 
 #endif //BIGINT_MY_VECTOR_H
