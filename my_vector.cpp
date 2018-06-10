@@ -75,6 +75,7 @@ void my_vector::push_back(unsigned int x) {
 }
 
 void my_vector::pop_back() {
+    assert(size != 0);
     _size--;
     if (!is_small){
         check_count();
@@ -83,6 +84,7 @@ void my_vector::pop_back() {
 }
 
 unsigned int &my_vector::operator[](unsigned int ind) {
+    assert(ind < size);
     if (is_small) return small[ind];
     else {
         check_count();
@@ -91,6 +93,7 @@ unsigned int &my_vector::operator[](unsigned int ind) {
 }
 
 unsigned int const &my_vector::operator[](unsigned int ind) const {
+    assert(ind < size);
     if (is_small) return small[ind];
     else return (*big)[ind];
 }
@@ -115,6 +118,7 @@ void my_vector::resize(unsigned int len, unsigned int z) {
 }
 
 unsigned int my_vector::back() const {
+    assert(size != 0);
     if (is_small) {
         return small[_size-1];
     } else {
