@@ -1,7 +1,8 @@
 #pragma once
 
 #include <iostream>
-#include <vector>
+#include "my_vector.h"
+//#include <vector>
 #include <string>
 #include <cstdlib>
 #include <algorithm>
@@ -10,7 +11,7 @@
 struct big_integer
 {
     int sign;
-    std::vector <unsigned int> digits;
+    my_vector digits;
     big_integer();
     big_integer(big_integer const& other);
 
@@ -76,7 +77,7 @@ bool operator>(big_integer const& a, big_integer const& b);
 bool operator<=(big_integer const& a, big_integer const& b);
 bool operator>=(big_integer const& a, big_integer const& b);
 
-std::vector<unsigned int> add(big_integer const& a, big_integer const& b);
-std::vector<unsigned int> sub(big_integer const& a, big_integer const& b);
+my_vector add(big_integer const& a, big_integer const& b);
+my_vector sub(big_integer const& a, big_integer const& b);
 
 std::string to_string(big_integer const& a);

@@ -1,17 +1,15 @@
 #include <string>
-#include <vector>
 #include "big_integer.h"
 
 const unsigned long long MAX_UINT32 = 4294967296u;
 
-big_integer::big_integer() : sign(1), digits(std::vector<unsigned int>(1, 0)) {}
+big_integer::big_integer() : sign(1), digits(my_vector()) {
+    digits.resize(1);
+}
 
 big_integer::big_integer(int a) {
-    if (a < 0) {
-        sign = -1;
-    } else {
-        sign = 1;
-    }
+    a < 0 ? sign = -1 : sign = 1;
+    digits = my_vector();
     digits.push_back((unsigned int) std::abs((long long) a));
 }
 
@@ -32,24 +30,26 @@ big_integer::big_integer(std::string const &str) {
     removeExtraZero();
 }
 
-std::vector<unsigned int> add(const big_integer &first, const big_integer &second) {
+my_vector add(const big_integer &first, const big_integer &second) {
     unsigned int carry = 0;
     int siz = std::max((int) first.digits.size(), (int) second.digits.size());
-    std::vector<unsigned int> answer(siz+1, 0);
+    my_vector answer;
+    answer.resize(siz+1);
     for (int i = 0; i < siz; i++) {
         long long sum = carry;
-        if (i < int(first.digits.size())) sum += (long long) first.digits[i];
+        if (i < int(first.digits.size())) sum += (long long) (first).digits[i];
         if (i < int(second.digits.size())) sum += (long long) second.digits[i];
         answer[i] = ((unsigned int) sum);
         carry = (unsigned int) (sum >> 32);
     }
-    if (carry != 0) answer[siz+1] = (carry);
+    if (carry != 0) answer[siz + 1] = (carry);
     return answer;
 }
 
-std::vector<unsigned int> sub(const big_integer &first, const big_integer &second) {
+my_vector sub(const big_integer &first, const big_integer &second) {
     unsigned int carry = 0;
-    std::vector<unsigned int> answer(first.digits.size(), 0);
+    my_vector answer;
+    answer.resize(first.digits.size());
     for (size_t i = 0; i < first.digits.size(); i++) {
         long long subtract = ((long long) first.digits[i] - (long long) carry);
         if (i < second.digits.size()) subtract -= (long long) second.digits[i];
@@ -81,8 +81,8 @@ void makeSameSize(big_integer &a, big_integer &b) {
 }
 
 void reverseNum(big_integer &a) {
-    for (unsigned int &uk: a.digits) {
-        uk = ~uk;
+    for (size_t i = 0; i < a.digits.size(); i++) {
+        a.digits[i] = ~a.digits[i];
     }
 }
 
@@ -118,13 +118,16 @@ big_integer &big_integer::operator-=(big_integer const &other) {
 
 big_integer &big_integer::operator*=(big_integer const &other) {
     sign = sign * other.sign;
-    std::vector<unsigned int> newDigits(digits.size() * other.digits.size(), 0);
+    my_vector newDigits = my_vector();
+    newDigits.resize(digits.size() * other.digits.size());
     unsigned int pointer = 0;
-    for (unsigned int a: digits) {
+    for (size_t i = 0; i < digits.size(); i++) {
+        unsigned int a = digits[i];
         unsigned int carry = 0;
         unsigned long long sum = 0;
         unsigned int new_pointer = pointer;
-        for (unsigned int b: other.digits) {
+        for (size_t j = 0; j < other.digits.size(); j++) {
+            unsigned int b = other.digits[j];
             sum = (unsigned long long) a * (unsigned long long) b + (unsigned long long) newDigits[new_pointer] +
                   (unsigned long long) carry;
             newDigits[new_pointer] = (unsigned int) sum;
@@ -243,11 +246,12 @@ big_integer &big_integer::operator<<=(int shift) {
         sign = -1;
         return *this;
     }
-    std::vector<unsigned int> newDigits;
-    if (shift / 32 != 0) newDigits.resize(shift / 32 + digits.size(), 0);
+    my_vector newDigits;
+    if (shift / 32 != 0) newDigits.resize(shift / 32 + digits.size());
     shift %= 32;
     unsigned int carry = 0;
-    for (unsigned int &digit : digits) {
+    for (size_t i = 0; i < digits.size(); i++) {
+        unsigned int digit = digits[i];
         unsigned int newCarry = (digit >> (32 - shift));
         digit <<= shift;
         digit += carry;
@@ -267,7 +271,7 @@ big_integer &big_integer::operator>>=(int shift) {
         sign = -1;
         return *this;
     }
-    std::vector<unsigned int> newDigits;
+    my_vector newDigits;
     for (int i = shift / 32; i < (int) digits.size(); i++) {
         newDigits.push_back(digits[i]);
     }
@@ -329,10 +333,11 @@ unsigned int big_integer::div_long_short(const unsigned int &a) {
 
 void big_integer::mul_long_short(const unsigned int &a) {
     unsigned int carry = 0;
-    for (unsigned int &digit : digits) {
+    for (size_t i = 0; i < digits.size(); i++) {
+        unsigned int digit = digits[i];
         unsigned long long result =
                 (unsigned long long) digit * (unsigned long long) (a) + (unsigned long long) carry;
-        digit = (unsigned int) result;
+        digits[i] = (unsigned int) result;
         carry = (unsigned int) (result >> 32);
     }
     if (carry != 0) digits.push_back(carry);
@@ -340,9 +345,10 @@ void big_integer::mul_long_short(const unsigned int &a) {
 
 void big_integer::add_long_short(const unsigned int &a) {
     unsigned int carry = a;
-    for (unsigned int &digit : digits) {
+    for (size_t i = 0; i < digits.size(); i++) {
+        unsigned int digit = digits[i];
         unsigned long long result = (unsigned long long) digit + (unsigned long long) (carry);
-        digit = (unsigned int) result;
+        digits[i] = (unsigned int) result;
         carry = (unsigned int) (result >> 32);
         if (carry == 0) {
             break;
@@ -354,7 +360,7 @@ void big_integer::add_long_short(const unsigned int &a) {
 }
 
 std::string big_integer::to_string() const {
-    if (digits.empty() || (*this == big_integer(0))) {
+    if (digits.size() == 0 || (*this == big_integer(0))) {
         return "0";
     }
     big_integer copy(*this);
@@ -395,11 +401,11 @@ big_integer operator^(big_integer first, big_integer const &second) {
     return first ^= second;
 }
 
-big_integer operator<<(big_integer first, int second) {
+big_integer operator<<(big_integer first, int const second) {
     return first <<= second;
 }
 
-big_integer operator>>(big_integer first, int second) {
+big_integer operator>>(big_integer first, int const second) {
     return first >>= second;
 }
 
@@ -411,10 +417,13 @@ int compare(big_integer const &a, big_integer const &b) {
         if (a.sign == 1) return a.digits.size() > b.digits.size() ? 1 : -1;
         else return a.digits.size() > b.digits.size() ? -1 : 1;
     }
-    for (int i = (int) a.digits.size() - 1; i >= 0; i--) {
+    for (int i = int(a.digits.size()) - 1; i >= 0; i--) {
         if (a.digits[i] != b.digits[i]) {
-            if (a.sign == 1) return a.digits[i] > b.digits[i] ? 1 : -1;
-            else return a.digits[i] > b.digits[i] ? -1 : 1;
+            if ((a.sign == 1 && (a.digits[i] > b.digits[i])) || (a.sign == -1 && (a.digits[i] < b.digits[i]))) {
+                return 1;
+            } else {
+                return -1;
+            }
         }
     }
     return 0;
@@ -494,11 +503,12 @@ void big_integer::divide(big_integer &res, big_integer const &a, big_integer con
 
     auto d = (unsigned int) (MAX_UINT32 / (b.digits[b.digits.size() - 1] + 1));
     big_integer u(a), v(b);
+
     u.mul_long_short(d);
     v.mul_long_short(d);
     u.removeExtraZero();
     v.removeExtraZero();
-    size_t n = u.digits.size(), m = v.digits.size(), len = n - m + 1;
+    unsigned int n = u.digits.size(), m = v.digits.size(), len = n - m + 1;
     res.digits.resize(len);
     big_integer dividend(0), divider(0);
     dividend.digits.resize(m + 1);

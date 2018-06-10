@@ -172,6 +172,8 @@ big_integer b = 1;
 EXPECT_EQ(a, 3);
 }
 
+//-----------------------------------------------------------------------------------------------
+
 TEST(correctness, mul)
 {
 big_integer a = 5;
@@ -648,6 +650,7 @@ namespace
         T b = extract_random_element(v);
 
         T ab = a * b;
+
         ASSERT_TRUE(ab / a == b);
         ASSERT_TRUE(ab / b == a);
 
