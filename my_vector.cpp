@@ -1,4 +1,4 @@
-//
+    //
 // Created by user on 02.06.18.
 //
 #include <iostream>
@@ -19,7 +19,7 @@ my_vector::my_vector(my_vector const &other) {
     _size = other._size;
     is_small = other.is_small;
     if (is_small) {
-        for (int i = 0; i < SMALL_SIZE; i++) {
+        for (unsigned int i = 0; i < SMALL_SIZE; i++) {
             small[i] = other.small[i];
         }
     } else {
@@ -32,7 +32,7 @@ my_vector &my_vector::operator=(my_vector const &other) {
     if (!is_small) big.reset();
     is_small = other.is_small;
     if (is_small) {
-        for (int i = 0; i < SMALL_SIZE; i++) {
+        for (unsigned int i = 0; i < SMALL_SIZE; i++) {
             small[i] = other.small[i];
         }
     } else {
@@ -43,11 +43,11 @@ my_vector &my_vector::operator=(my_vector const &other) {
 
 void my_vector::make_big() {
     if (!is_small || _size < SMALL_SIZE) return;
-    std::vector<unsigned int> copy(_size, 0);
-    for (int i = 0; i < SMALL_SIZE; i++) {
-        copy[i] = small[i];
+    std::vector<unsigned int>* copy = new std::vector<unsigned int>(_size, 0);
+    for (unsigned int i = 0; i < SMALL_SIZE; i++) {
+        (*copy)[i] = small[i];
     }
-    new(&big) std::shared_ptr<std::vector<unsigned int>>(new std::vector<unsigned int>(copy));
+    new(&big) std::shared_ptr<std::vector<unsigned int>>((copy));
     is_small = false;
 }
 
@@ -98,7 +98,7 @@ unsigned int const &my_vector::operator[](unsigned int ind) const {
 void my_vector::resize(unsigned int len, unsigned int z) {
     _size = len;
     make_big();
-    for (int i = 0; i < _size; i++) {
+    for (unsigned int i = 0; i < _size; i++) {
         if (is_small) small[i] = z;
         else (*big)[i] = z;
     }
