@@ -5,6 +5,7 @@
 #include "my_vector.h"
 #include <cassert>
 
+
 my_vector::my_vector() : _size(0), is_small(true) {
     for (unsigned int &i : small) {
         i = 0;
